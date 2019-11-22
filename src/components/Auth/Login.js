@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import useFormValidation from "./useFormValidation";
 import validateLogin from "./validateLogin";
+import firebase from "../../firebase";
+import { Link } from "react-router-dom";
 
 const INITIAL_STATE = {
   name: "",
@@ -9,6 +11,22 @@ const INITIAL_STATE = {
 };
 
 function Login(props) {
+  const authenticateUser = async () => {
+    const { email, password, name } = values;
+
+    try {
+      login
+        ? await firebase.login(email, password)
+        : await firebase.register(name, email, password);
+
+      props.history.push("/");
+    } catch (error) {
+      console.error("Authentication error", error);
+
+      setFirebaseError(error.message);
+    }
+  };
+
   const {
     handleChange,
     handleSubmit,
@@ -16,9 +34,10 @@ function Login(props) {
     values,
     errors,
     isSubmitting
-  } = useFormValidation(INITIAL_STATE, validateLogin);
+  } = useFormValidation(INITIAL_STATE, validateLogin, authenticateUser);
 
   const [login, setLogin] = useState(true);
+  const [firebaseError, setFirebaseError] = useState(null);
 
   return (
     <div>
@@ -38,6 +57,7 @@ function Login(props) {
             autoComplete="nope"
           />
         )}
+
         <input
           onChange={handleChange}
           value={values.email}
@@ -48,7 +68,9 @@ function Login(props) {
           placeholder="Your email"
           autoComplete="nope"
         />
+
         {errors.email && <p className="error-text">{errors.email}</p>}
+
         <input
           onChange={handleChange}
           value={values.password}
@@ -59,7 +81,9 @@ function Login(props) {
           autoComplete="new-password"
           placeholder="Choose a secure password"
         />
+
         {errors.password && <p className="error-text">{errors.password}</p>}
+        {firebaseError && <p className="error-text">{firebaseError}</p>}
 
         <div className="flex mt3">
           <button
@@ -79,6 +103,9 @@ function Login(props) {
           </button>
         </div>
       </form>
+      <div className="forgot-password">
+        <Link to="/forgot">Forgot password?</Link>
+      </div>
     </div>
   );
 }
