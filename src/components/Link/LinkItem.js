@@ -56,7 +56,9 @@ function LinkItem({ link, index, showCount, history }) {
       </div>
       <div className="ml1">
         <div>
-          {link.description}{" "}
+          <a href={link.url} className="black no-underline">
+            {link.description}{" "}
+          </a>
           <span
             style={{ fontStyle: "italic", color: "orange" }}
             className="link"

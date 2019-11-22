@@ -7,8 +7,13 @@ function LinkList(props) {
 
   const { firebase } = useContext(FirebaseContext);
 
+  const isNewPage = props.location.pathname.includes("new");
+
   const getLinks = () => {
-    firebase.db.collection("links").onSnapshot(handleSnapshot);
+    firebase.db
+      .collection("links")
+      .orderBy("created", "desc")
+      .onSnapshot(handleSnapshot);
   };
 
   const handleSnapshot = snapshot => {
@@ -26,9 +31,20 @@ function LinkList(props) {
     getLinks();
   }, []);
 
+  const renderLinks = () => {
+    if (isNewPage) {
+      return links;
+    }
+
+    const topLinks = links
+      .slice()
+      .sort((l1, l2) => l2.votes.length - l1.votes.length);
+    return topLinks;
+  };
+
   return (
     <div>
-      {links.map((link, i) => (
+      {renderLinks().map((link, i) => (
         <LinkItem key={link.id} showCount={true} link={link} index={i + 1} />
       ))}
     </div>
