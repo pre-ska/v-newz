@@ -170,3 +170,14 @@ textarea {
   margin-bottom: 0.2em;
   max-width: 500px;
 }
+
+.paging-button {
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.paging-button:disabled {
+  opacity: 0.2;
+}

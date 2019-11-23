@@ -8,7 +8,7 @@ function LinkList(props) {
   const { firebase } = useContext(FirebaseContext);
 
   const [links, setLinks] = useState([]);
-  const [cursor, setCursor] = useState(null);
+  // const [cursor, setCursor] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const isNewPage = props.location.pathname.includes("new");
@@ -28,14 +28,14 @@ function LinkList(props) {
 
     const lastLink = links[links.length - 1];
 
-    setCursor(lastLink);
+    // setCursor(lastLink);
     setLoading(false);
   };
 
   const getLinks = () => {
     setLoading(true);
 
-    const hasCursor = Boolean(cursor);
+    // const hasCursor = Boolean(cursor);
 
     if (isTopPage) {
       return linksRef
@@ -66,9 +66,10 @@ function LinkList(props) {
           const links = response.data;
           const lastLink = links[links.length - 1];
           setLinks(links);
-          setCursor(lastLink);
+          // setCursor(lastLink);
           setLoading(false);
         });
+
       return () => {};
     }
   };
@@ -92,6 +93,10 @@ function LinkList(props) {
 
   const pageIndex = page ? (page - 1) * LINKS_PER_PAGE + 1 : 0;
 
+  const previous_ = isNewPage && page > 1;
+
+  const next_ = links.length === LINKS_PER_PAGE;
+  console.log(previous_, next_);
   return (
     <div style={{ opacity: loading ? 0.25 : 1 }}>
       {links.map((link, i) => (
@@ -102,16 +107,23 @@ function LinkList(props) {
           index={i + pageIndex}
         />
       ))}
-      {isNewPage && (
-        <div className="pagination">
-          <div className="pointer mr2" onClick={visitPreviousPage}>
-            Previous
-          </div>
-          <div className="pointer" onClick={visitNextPage}>
-            Next
-          </div>
-        </div>
-      )}
+      <div className="pagination">
+        <button
+          disabled={!previous_}
+          className="paging-button"
+          onClick={visitPreviousPage}
+        >
+          Previous
+        </button>
+
+        <button
+          disabled={!next_}
+          className="paging-button"
+          onClick={visitNextPage}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
