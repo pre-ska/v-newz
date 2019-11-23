@@ -8,7 +8,6 @@ function LinkList(props) {
   const { firebase } = useContext(FirebaseContext);
 
   const [links, setLinks] = useState([]);
-  // const [cursor, setCursor] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const isNewPage = props.location.pathname.includes("new");
@@ -26,16 +25,11 @@ function LinkList(props) {
 
     setLinks(links);
 
-    const lastLink = links[links.length - 1];
-
-    // setCursor(lastLink);
     setLoading(false);
   };
 
   const getLinks = () => {
     setLoading(true);
-
-    // const hasCursor = Boolean(cursor);
 
     if (isTopPage) {
       return linksRef
@@ -47,15 +41,7 @@ function LinkList(props) {
         .orderBy("created", "desc")
         .limit(LINKS_PER_PAGE)
         .onSnapshot(handleSnapshot);
-    }
-    // else if (hasCursor) {
-    //   return linksRef
-    //     .orderBy("created", "desc")
-    //     .startAfter(cursor.created)
-    //     .limit(LINKS_PER_PAGE)
-    //     .onSnapshot(handleSnapshot);
-    // }
-    else {
+    } else {
       const offset = page * LINKS_PER_PAGE - LINKS_PER_PAGE;
 
       axios
@@ -64,9 +50,7 @@ function LinkList(props) {
         )
         .then(response => {
           const links = response.data;
-          const lastLink = links[links.length - 1];
           setLinks(links);
-          // setCursor(lastLink);
           setLoading(false);
         });
 
@@ -86,7 +70,6 @@ function LinkList(props) {
 
   const visitNextPage = () => {
     if (LINKS_PER_PAGE / links.length === 1) {
-      // if (page <= links.length / LINKS_PER_PAGE) {
       props.history.push(`/new/${page + 1}`);
     }
   };
@@ -96,7 +79,7 @@ function LinkList(props) {
   const previous_ = isNewPage && page > 1;
 
   const next_ = links.length === LINKS_PER_PAGE;
-  console.log(previous_, next_);
+
   return (
     <div style={{ opacity: loading ? 0.25 : 1 }}>
       {links.map((link, i) => (
