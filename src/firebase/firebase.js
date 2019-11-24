@@ -34,6 +34,10 @@ class Firebase {
   async resetPassword(email) {
     await this.auth.sendPasswordResetEmail(email);
   }
+
+  async getTime() {
+    return await this.db.FieldValue.serverTimestamp();
+  }
 }
 
 const firebase = new Firebase();

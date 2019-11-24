@@ -12,25 +12,32 @@ function CreateLink(props) {
   const { firebase, user } = useContext(FirebaseContext);
 
   const handleCreateLink = () => {
-    if (!user) {
-      props.history.push("/login");
-    } else {
-      const { url, description } = values;
-      const newLink = {
-        url,
-        description,
-        postedBy: {
-          id: user.uid,
-          name: user.displayName
-        },
-        votes: [],
-        comments: [],
-        created: Date.now()
-      };
+    if (!user) props.history.push("/login");
+    else {
+      async function fbTime() {
+        const { url, description } = values;
 
-      firebase.db.collection("links").add(newLink);
+        const t =
+          (await firebase.db.app.firebase_.firestore.Timestamp.now().seconds) *
+          1000;
+        const newLink = {
+          url,
+          description,
+          postedBy: {
+            id: user.uid,
+            name: user.displayName
+          },
+          votes: [],
+          comments: [],
+          created: t
+        };
 
-      props.history.push("/");
+        firebase.db.collection("links").add(newLink);
+
+        props.history.push("/");
+      }
+
+      fbTime();
     }
   };
 

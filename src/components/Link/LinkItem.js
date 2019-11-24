@@ -67,10 +67,10 @@ function LinkItem({ link, index, showCount, history }) {
             {link.description}{" "}
           </a>
           <span
-            style={{ fontStyle: "italic", color: "orange" }}
+            style={{ fontStyle: "italic", color: "#B5B5B5" }}
             className="link"
           >
-            ({getDomain(link.url)})
+            {getDomain(link.url)}
           </span>
         </div>
         <div className="f6 lh-copy gray">

@@ -12,42 +12,51 @@ function LinkDetail(props) {
   const linkRef = firebase.db.collection("links").doc(linkId);
 
   useEffect(() => {
-    getLink();
+    const unsubscribe = getLink();
+    return () => unsubscribe();
   }, []);
 
   const getLink = () => {
-    linkRef.get().then(doc => {
-      setLink({ ...doc.data(), id: doc.id });
+    return linkRef.onSnapshot(snapshot => {
+      const link = snapshot.data();
+      setLink(link);
     });
   };
 
   const handleAddComment = () => {
-    if (!user) {
-      props.history.push("/login");
-    } else {
+    if (!user) props.history.push("/login");
+    else if (commentText !== "") {
       linkRef.get().then(doc => {
         if (doc.exists) {
-          const previousComments = doc.data().comments;
+          async function fbTime() {
+            const t =
+              (await firebase.db.app.firebase_.firestore.Timestamp.now()
+                .seconds) * 1000;
 
-          const comment = {
-            postedBy: {
-              id: user.uid,
-              name: user.displayName
-            },
-            created: Date.now(),
-            text: commentText
-          };
+            const previousComments = doc.data().comments;
 
-          const updatedComments = [...previousComments, comment];
+            const comment = {
+              postedBy: {
+                id: user.uid,
+                name: user.displayName
+              },
+              created: t,
+              text: commentText
+            };
 
-          linkRef.update({ comments: updatedComments });
+            const updatedComments = [...previousComments, comment];
 
-          setLink(previousState => ({
-            ...previousState,
-            comments: updatedComments
-          }));
+            linkRef.update({ comments: updatedComments });
 
-          setCommentText("");
+            setLink(previousState => ({
+              ...previousState,
+              comments: updatedComments
+            }));
+
+            setCommentText("");
+          }
+
+          fbTime();
         }
       });
     }
@@ -64,11 +73,13 @@ function LinkDetail(props) {
         cols="60"
         rows="6"
       />
+
       <div>
         <button className="button" onClick={handleAddComment}>
           Add comment
         </button>
       </div>
+
       {link.comments.map((comment, i) => (
         <div key={i}>
           <p className="comment-author">
