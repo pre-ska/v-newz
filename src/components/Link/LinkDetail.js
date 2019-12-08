@@ -28,35 +28,27 @@ function LinkDetail(props) {
     else if (commentText !== "") {
       linkRef.get().then(doc => {
         if (doc.exists) {
-          async function fbTime() {
-            const t =
-              (await firebase.db.app.firebase_.firestore.Timestamp.now()
-                .seconds) * 1000;
+          const previousComments = doc.data().comments;
 
-            const previousComments = doc.data().comments;
+          const comment = {
+            postedBy: {
+              id: user.uid,
+              name: user.displayName
+            },
+            created: Date.now(),
+            text: commentText
+          };
 
-            const comment = {
-              postedBy: {
-                id: user.uid,
-                name: user.displayName
-              },
-              created: t,
-              text: commentText
-            };
+          const updatedComments = [...previousComments, comment];
 
-            const updatedComments = [...previousComments, comment];
+          linkRef.update({ comments: updatedComments });
 
-            linkRef.update({ comments: updatedComments });
+          setLink(previousState => ({
+            ...previousState,
+            comments: updatedComments
+          }));
 
-            setLink(previousState => ({
-              ...previousState,
-              comments: updatedComments
-            }));
-
-            setCommentText("");
-          }
-
-          fbTime();
+          setCommentText("");
         }
       });
     }

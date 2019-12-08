@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import useFormValidation from "../Auth/useFormValidation";
 import validateCreateLink from "../Auth/validateCreateLink";
 import FirebaseContext from "../../firebase/context";
-
+import fb from "../../firebase";
 const INITIAL_STATE = {
   description: "",
   url: ""
@@ -14,30 +14,23 @@ function CreateLink(props) {
   const handleCreateLink = () => {
     if (!user) props.history.push("/login");
     else {
-      async function fbTime() {
-        const { url, description } = values;
+      const { url, description } = values;
 
-        const t =
-          (await firebase.db.app.firebase_.firestore.Timestamp.now().seconds) *
-          1000;
-        const newLink = {
-          url,
-          description,
-          postedBy: {
-            id: user.uid,
-            name: user.displayName
-          },
-          votes: [],
-          comments: [],
-          created: t
-        };
+      const newLink = {
+        url,
+        description,
+        postedBy: {
+          id: user.uid,
+          name: user.displayName
+        },
+        votes: [],
+        comments: [],
+        created: Date.now()
+      };
+      // fb.db.FieldValue.serverTimestamp()
+      firebase.db.collection("links").add(newLink);
 
-        firebase.db.collection("links").add(newLink);
-
-        props.history.push("/");
-      }
-
-      fbTime();
+      props.history.push("/");
     }
   };
 

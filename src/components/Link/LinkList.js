@@ -17,6 +17,7 @@ function LinkList(props) {
 
   const handleSnapshot = snapshot => {
     const links = snapshot.docs.map(doc => {
+      console.log(doc.createdAt);
       return {
         id: doc.id,
         ...doc.data()
@@ -60,6 +61,13 @@ function LinkList(props) {
 
   useEffect(() => {
     const unsubscribe = getLinks();
+
+    linksRef
+      .doc("MsTatQ7UMMN0juYf2m9z")
+      .update({ createdAt: "oooooooooooooooo" });
+    // .then(doc => {
+    //   console.log(doc.data());
+    // });
 
     return () => unsubscribe();
   }, [isTopPage, page]);
